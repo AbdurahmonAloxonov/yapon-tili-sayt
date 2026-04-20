@@ -14,6 +14,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -23,7 +26,7 @@
 <nav class="navbar" role="navigation" aria-label="Asosiy navigatsiya">
   <div class="nav-inner">
     <div class="nav-logo">
-      <span class="jp">日本語</span> N4 Darsiligi
+      <span class="jp">日本語</span> N4 Darsi
     </div>
 
     <button class="nav-btn active" id="nb-home"     onclick="showSection('home')"     aria-label="Bosh sahifa">
@@ -409,6 +412,17 @@
 <!-- Scripts — load data first, then app logic -->
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
+
+<!-- PWA Service Worker -->
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/service-worker.js")
+        .then(() => console.log("Service Worker tayyor!"))
+        .catch(err => console.log("Service Worker xato:", err));
+    });
+  }
+</script>
 
 </body>
 </html>
