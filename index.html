@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="JLPT N4 Yapon tili — 300 ta kanji va katakana o'zbek tilida o'rganish platformasi">
+  <meta name="theme-color" content="#2563EB">
+  <meta property="og:title" content="Yapon Tili N4 — O'zbek tilida o'rganish">
+  <meta property="og:description" content="300 ta JLPT N4 Kanji + Katakana so'zlari bilan o'rganish">
+  <title>Yapon Tili — JLPT N4 O'rganish</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" role="navigation" aria-label="Asosiy navigatsiya">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <span class="jp">日本語</span> N4 Darsi
+    </div>
+
+    <button class="nav-btn active" id="nb-home"     onclick="showSection('home')"     aria-label="Bosh sahifa">
+      <span class="icon">🏠</span><span class="txt">Bosh</span>
+    </button>
+    <button class="nav-btn"        id="nb-kanji"    onclick="showSection('kanji')"    aria-label="Kanji bo'limi">
+      <span class="icon jp" style="font-size:16px">漢</span><span class="txt">Kanji</span>
+    </button>
+    <button class="nav-btn"        id="nb-katakana" onclick="showSection('katakana')" aria-label="Katakana bo'limi">
+      <span class="icon jp" style="font-size:16px">カ</span><span class="txt">Katakana</span>
+    </button>
+    <button class="nav-btn"        id="nb-flash"    onclick="showSection('flash')"    aria-label="Flesh kartalar">
+      <span class="icon">🃏</span><span class="txt">Kartalar</span>
+    </button>
+    <button class="nav-btn"        id="nb-test"     onclick="showSection('test')"     aria-label="Test">
+      <span class="icon">✏️</span><span class="txt">Test</span>
+    </button>
+    <button class="nav-btn"        id="nb-progress" onclick="showSection('progress')" aria-label="Progress">
+      <span class="icon">📊</span><span class="txt">Progress</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main">
+
+  <!-- ==================== HOME ==================== -->
+  <section class="section active" id="s-home" aria-labelledby="home-title">
+
+    <div class="hero">
+      <h1 id="home-title">Yapon tilini <span>o'zbekcha</span> o'rgan!</h1>
+      <p>JLPT N4 — 300 ta Kanji va Katakana so'zlari bilan tez va samarali o'qish platformasi</p>
+      <div class="hero-stats">
+        <div class="hstat"><div class="num">300</div><div class="lbl">Kanji</div></div>
+        <div class="hstat"><div class="num">46+</div><div class="lbl">Katakana</div></div>
+        <div class="hstat"><div class="num" id="h-klearned">0</div><div class="lbl">O'rganildi</div></div>
+        <div class="hstat"><div class="num" id="h-tests">0</div><div class="lbl">Testlar</div></div>
+      </div>
+    </div>
+
+    <div class="daily-banner">
+      <div class="db-icon">📅</div>
+      <div>
+        <h3>Kunlik Takrorlash</h3>
+        <p>Bugun 10 ta kanji takrorlang va bilimingizni mustahkamlang</p>
+      </div>
+      <button class="daily-btn" onclick="startDaily()">Boshlash →</button>
+    </div>
+
+    <div class="prog-card">
+      <h2>📈 Umumiy Progress</h2>
+      <div class="prog-rows">
+        <div class="prog-row">
+          <div class="prog-label"><span>Kanji (N4)</span><span id="ph-k">0 / 300</span></div>
+          <div class="progbar"><div class="progbar-fill" id="pb-k" style="width:0%"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label"><span>Katakana</span><span id="ph-ka">0 / 46</span></div>
+          <div class="progbar"><div class="progbar-fill" id="pb-ka" style="width:0%;background:linear-gradient(90deg,var(--sec),#34D399)"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label"><span>Katakana So'zlari</span><span id="ph-kw">0 / 165</span></div>
+          <div class="progbar"><div class="progbar-fill" id="pb-kw" style="width:0%;background:linear-gradient(90deg,var(--acc),#F97316)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qnav">
+      <div class="qcard" onclick="showSection('kanji')" role="button" tabindex="0">
+        <div class="icon jp" style="font-size:36px">漢字</div>
+        <h3>Kanji O'rganish</h3>
+        <p>300 ta N4 darajasi Kanji — ma'no, o'qilishi va misollar bilan</p>
+        <div class="badge">300 ta Kanji</div>
+      </div>
+      <div class="qcard" onclick="showSection('katakana')" role="button" tabindex="0">
+        <div class="icon jp" style="font-size:36px">カタカナ</div>
+        <h3>Katakana</h3>
+        <p>To'liq katakana jadvali va 165+ so'z lug'ati</p>
+        <div class="badge" style="background:var(--sec-l);color:var(--sec)">46 belgi + so'zlar</div>
+      </div>
+      <div class="qcard" onclick="showSection('flash')" role="button" tabindex="0">
+        <div class="icon">🃏</div>
+        <h3>Flesh Kartalar</h3>
+        <p>Kanji va katakana uchun 3D interaktiv kartochkalar</p>
+        <div class="badge" style="background:var(--acc-l);color:var(--acc)">Animatsiya</div>
+      </div>
+      <div class="qcard" onclick="showSection('test')" role="button" tabindex="0">
+        <div class="icon">✏️</div>
+        <h3>Test</h3>
+        <p>O'z bilimingizni 4 xil test turi bilan sinab ko'ring</p>
+        <div class="badge" style="background:var(--red-l);color:var(--red)">4 xil tur</div>
+      </div>
+    </div>
+
+  </section>
+  <!-- END HOME -->
+
+  <!-- ==================== KANJI ==================== -->
+  <section class="section" id="s-kanji" aria-labelledby="kanji-title">
+
+    <div class="sec-head">
+      <h2 id="kanji-title">📖 Kanji — N4 Darajasi</h2>
+      <div class="sec-badge" id="kb-badge">0 / 300 o'rganildi</div>
+    </div>
+
+    <div class="sec-controls">
+      <div class="search-box">
+        <span class="s-icon" aria-hidden="true">🔍</span>
+        <input type="search" id="kanji-search" placeholder="Kanji yoki ma'no qidirish..." oninput="renderKanji()" autocomplete="off" aria-label="Kanji qidirish">
+      </div>
+      <button class="filter-btn active-filter" id="filter-all"     onclick="setKanjiFilter('all')">Hammasi</button>
+      <button class="filter-btn"               id="filter-learned" onclick="setKanjiFilter('learned')">O'rganilgan ✓</button>
+      <button class="filter-btn"               id="filter-new"     onclick="setKanjiFilter('new')">Yangi</button>
+    </div>
+
+    <div class="kanji-grid" id="kanji-grid" role="list" aria-label="Kanji ro'yxati"></div>
+    <div class="pagination"  id="kanji-pages" role="navigation" aria-label="Sahifalar"></div>
+
+  </section>
+  <!-- END KANJI -->
+
+  <!-- ==================== KATAKANA ==================== -->
+  <section class="section" id="s-katakana" aria-labelledby="katakana-title">
+
+    <div class="sec-head">
+      <h2 id="katakana-title"><span class="jp">カタカナ</span> Katakana</h2>
+      <div class="sec-badge" id="kata-badge">0 / 46 o'rganildi</div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" id="kt-chart" onclick="setKataTab('chart')" role="tab" aria-selected="true">📊 Jadval</button>
+      <button class="tab"        id="kt-words" onclick="setKataTab('words')" role="tab" aria-selected="false">📝 So'zlar</button>
+    </div>
+
+    <!-- Chart tab -->
+    <div id="kata-chart-section" role="tabpanel">
+      <div class="sec-controls">
+        <div class="search-box">
+          <span class="s-icon" aria-hidden="true">🔍</span>
+          <input type="search" id="kata-search" placeholder="Katakana yoki o'qilish qidirish..." oninput="renderKataChart()" autocomplete="off" aria-label="Katakana qidirish">
+        </div>
+      </div>
+      <div id="kata-chart-wrap"></div>
+    </div>
+
+    <!-- Words tab -->
+    <div id="kata-words-section" style="display:none" role="tabpanel">
+      <div class="sec-controls">
+        <div class="search-box">
+          <span class="s-icon" aria-hidden="true">🔍</span>
+          <input type="search" id="kword-search" placeholder="So'z qidirish..." oninput="renderKataWords()" autocomplete="off" aria-label="So'z qidirish">
+        </div>
+      </div>
+      <div class="word-grid" id="kata-words-grid"></div>
+    </div>
+
+  </section>
+  <!-- END KATAKANA -->
+
+  <!-- ==================== FLASHCARDS ==================== -->
+  <section class="section" id="s-flash" aria-labelledby="flash-title">
+
+    <div class="sec-head">
+      <h2 id="flash-title">🃏 Flesh Kartalar</h2>
+    </div>
+
+    <div class="flash-type-tabs" role="tablist">
+      <button class="ftab active" id="ft-kanji"    onclick="setFlashType('kanji')"    role="tab">漢 Kanji</button>
+      <button class="ftab"        id="ft-katakana" onclick="setFlashType('katakana')" role="tab">カ Katakana</button>
+      <button class="ftab"        id="ft-learned"  onclick="setFlashType('learned')"  role="tab">✓ O'rganilganlar</button>
+    </div>
+
+    <div class="flash-wrap">
+      <div class="flash-progress-row">
+        <div class="flash-meta" id="flash-meta">1 / 300</div>
+        <div class="progbar" style="flex:1"><div class="progbar-fill" id="flash-pb" style="width:0%"></div></div>
+      </div>
+
+      <div class="flash-scene" onclick="flipCard()" role="button" aria-label="Kartani teskari qilish" tabindex="0">
+        <div class="flash-card" id="flash-card">
+          <div class="flash-front">
+            <div class="fchar jp" id="fc-front">漢</div>
+            <div class="fhint">↻ Bosib ma'nosini ko'ring</div>
+            <div class="fkbd">Klaviatura: <kbd>Space</kbd> yoki <kbd>↑↓</kbd> — teskari</div>
+          </div>
+          <div class="flash-back">
+            <div class="bmeaning" id="fc-meaning">Xitoy</div>
+            <div class="breading jp" id="fc-reading">カン</div>
+            <div class="bexample" id="fc-example"><span class="jp">漢字</span> — Xitoy yozuvi</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flash-controls">
+        <button class="fc-btn prev" onclick="flashNav(-1)" aria-label="Oldingi karta">← Oldingi</button>
+        <button class="fc-btn flip" onclick="flipCard()"   aria-label="Teskari qilish">↻ Teskari</button>
+        <button class="fc-btn mark" onclick="markFlash()"  id="flash-mark-btn">✓ O'rgandim</button>
+        <button class="fc-btn next" onclick="flashNav(1)"  aria-label="Keyingi karta">Keyingi →</button>
+      </div>
+
+      <div class="kbd-hint">
+        <kbd>←</kbd> <kbd>→</kbd> — o'tish &nbsp;|&nbsp; <kbd>Space</kbd> — teskari &nbsp;|&nbsp; <kbd>Enter</kbd> — o'rgandim
+      </div>
+    </div>
+
+  </section>
+  <!-- END FLASHCARDS -->
+
+  <!-- ==================== TEST ==================== -->
+  <section class="section" id="s-test" aria-labelledby="test-title">
+
+    <!-- Setup -->
+    <div class="test-setup" id="test-setup">
+      <h2 id="test-title">✏️ Bilimingizni Sinab Ko'ring</h2>
+      <p>Test turini tanlang va boshlang</p>
+
+      <div class="test-type-grid" role="radiogroup" aria-label="Test turi">
+        <div class="ttype-card sel" id="tt-k-meaning" onclick="selTestType('k-meaning')" role="radio" aria-checked="true" tabindex="0">
+          <div class="ticon"><span class="jp">漢</span>→📖</div>
+          <div class="tlbl">Kanji → Ma'no</div>
+          <div class="tdesc">Kanjini ko'rib ma'nosini toping</div>
+        </div>
+        <div class="ttype-card" id="tt-meaning-k" onclick="selTestType('meaning-k')" role="radio" aria-checked="false" tabindex="0">
+          <div class="ticon">📖→<span class="jp">漢</span></div>
+          <div class="tlbl">Ma'no → Kanji</div>
+          <div class="tdesc">Ma'nosini ko'rib kanjini toping</div>
+        </div>
+        <div class="ttype-card" id="tt-kata-read" onclick="selTestType('kata-read')" role="radio" aria-checked="false" tabindex="0">
+          <div class="ticon"><span class="jp">カ</span>→📖</div>
+          <div class="tlbl">Katakana → O'qilish</div>
+          <div class="tdesc">Katakana belgisini o'qing</div>
+        </div>
+        <div class="ttype-card" id="tt-kata-word" onclick="selTestType('kata-word')" role="radio" aria-checked="false" tabindex="0">
+          <div class="ticon">📝→🔤</div>
+          <div class="tlbl">Katakana So'z</div>
+          <div class="tdesc">Katakana so'zini aniqlang</div>
+        </div>
+      </div>
+
+      <div class="qcount-wrap">
+        <label for="qcount">Savollar soni: <strong id="qcount-lbl">20</strong></label>
+        <br>
+        <input type="range" min="5" max="50" value="20" id="qcount" aria-label="Savollar soni"
+               oninput="document.getElementById('qcount-lbl').textContent=this.value">
+      </div>
+
+      <button class="start-btn" onclick="startTest()">▶ Testni Boshlash</button>
+    </div>
+
+    <!-- Active test -->
+    <div class="test-area" id="test-area" aria-live="polite">
+      <div class="test-progress">
+        <div class="test-progress-info">
+          <span id="tq-label">Savol 1 / 20</span>
+          <span id="tq-score">✓ 0  ✗ 0</span>
+        </div>
+        <div class="progbar"><div class="progbar-fill" id="test-pb" style="width:0%"></div></div>
+      </div>
+
+      <div class="test-q" id="test-q-box">
+        <div class="qlabel" id="q-label">Kanjini tanlang</div>
+        <div id="q-content"></div>
+      </div>
+
+      <div class="choices" id="choices" role="group" aria-label="Javoblar"></div>
+    </div>
+
+    <!-- Result -->
+    <div class="test-result" id="test-result">
+      <div class="result-circle">
+        <div class="rs" id="res-pct">0%</div>
+        <div class="rl">Natija</div>
+      </div>
+      <div class="result-grid">
+        <div class="rstat good"><div class="rv" id="res-c">0</div><div class="rl">To'g'ri ✓</div></div>
+        <div class="rstat bad"> <div class="rv" id="res-w">0</div><div class="rl">Xato ✗</div></div>
+      </div>
+      <div class="res-msg" id="res-msg"></div>
+      <div class="res-actions">
+        <button class="retry-btn"     onclick="retryTest()">🔄 Qayta Urinish</button>
+        <button class="retry-btn out" onclick="backToTestSetup()">← Testlar</button>
+      </div>
+    </div>
+
+  </section>
+  <!-- END TEST -->
+
+  <!-- ==================== PROGRESS ==================== -->
+  <section class="section" id="s-progress" aria-labelledby="progress-title">
+
+    <div class="sec-head">
+      <h2 id="progress-title">📊 Mening Progressim</h2>
+    </div>
+
+    <div class="prog-section">
+
+      <div class="prog-big-card">
+        <h3><span class="ph-icon">漢</span> Kanji Progressi</h3>
+        <div class="prog-item">
+          <div class="prog-item-head">
+            <span class="prog-item-name">O'rganilgan Kanji</span>
+            <span class="prog-item-count" id="pk-count">0 / 300</span>
+          </div>
+          <div class="progbar2">
+            <div class="progbar2-fill" id="pk-bar" style="width:0%;background:linear-gradient(90deg,var(--pri),#60A5FA)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prog-big-card">
+        <h3><span class="ph-icon jp">カ</span> Katakana Progressi</h3>
+        <div class="prog-item">
+          <div class="prog-item-head">
+            <span class="prog-item-name">O'rganilgan Katakana belgilari</span>
+            <span class="prog-item-count" id="pka-count">0 / 46</span>
+          </div>
+          <div class="progbar2">
+            <div class="progbar2-fill" id="pka-bar" style="width:0%;background:linear-gradient(90deg,var(--sec),#34D399)"></div>
+          </div>
+        </div>
+        <div class="prog-item" style="margin-top:16px">
+          <div class="prog-item-head">
+            <span class="prog-item-name">O'rganilgan Katakana So'zlari</span>
+            <span class="prog-item-count" id="pkw-count">0 / 165</span>
+          </div>
+          <div class="progbar2">
+            <div class="progbar2-fill" id="pkw-bar" style="width:0%;background:linear-gradient(90deg,var(--acc),#F97316)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prog-big-card">
+        <h3><span class="ph-icon">📝</span> Test Tarixi</h3>
+        <div class="hist-list" id="hist-list">
+          <div style="text-align:center;color:var(--muted);padding:20px;font-size:14px">Hali test topshirilmagan</div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:8px">
+        <button class="reset-btn" onclick="resetProgress()">🗑 Barcha Progressni Tozalash</button>
+      </div>
+
+    </div>
+  </section>
+  <!-- END PROGRESS -->
+
+</main>
+<!-- END MAIN -->
+
+<!-- ===== KANJI DETAIL MODAL ===== -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-char" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span style="font-size:13px;font-weight:700;color:var(--muted)" id="modal-num">#1</span>
+      <button class="modal-close" onclick="closeModal()" aria-label="Yopish">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-kanji jp" id="modal-char" aria-label="Kanji belgisi">漢</div>
+      <div class="modal-rows">
+        <div class="modal-row"><span class="lbl">Ma'no</span>    <span class="val"    id="modal-meaning">—</span></div>
+        <div class="modal-row"><span class="lbl">Onyomi</span>   <span class="val jp" id="modal-on">—</span></div>
+        <div class="modal-row"><span class="lbl">Kunyomi</span>  <span class="val jp" id="modal-kun">—</span></div>
+        <div class="modal-row">
+          <span class="lbl">Misol</span>
+          <span class="val">
+            <span class="jp" id="modal-ex">—</span><br>
+            <small id="modal-exm" style="color:var(--muted);font-size:12px;font-weight:600">—</small>
+          </span>
+        </div>
+      </div>
+      <div class="modal-nav">
+        <button class="modal-nav-btn" onclick="modalNav(-1)" aria-label="Oldingi kanji">← Oldingi</button>
+        <button class="modal-nav-btn" onclick="modalNav(1)"  aria-label="Keyingi kanji">Keyingi →</button>
+      </div>
+      <button class="learn-btn" id="learn-btn" onclick="toggleLearnModal()">✓ O'rgandim deb belgilash</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast" role="status" aria-live="polite">Saqlandi!</div>
+
+<!-- Scripts — load data first, then app logic -->
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
