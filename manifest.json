@@ -1,21 +1,15 @@
 {
   "name": "Yapon Tili — JLPT N4 O'rganish",
-  "id": "yapon-tili-n4",
   "short_name": "YaponTili",
   "description": "JLPT N4 Yapon tili — 300 ta kanji va katakana o'zbek tilida o'rganish platformasi",
+  "id": "yapon-tili-n4",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#2563EB",
   "lang": "uz",
-  "screenshots": [
-  {
-    "src": "icons/screenshot.png",
-    "sizes": "1280x720",
-    "type": "image/png"
-  }
-],
+  "categories": ["education", "lifestyle"],
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -30,5 +24,4 @@
       "purpose": "any maskable"
     }
   ]
-
 }

@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- PWA Manifest -->
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
 
   <!-- Styles -->
@@ -47,6 +47,10 @@
     <button class="nav-btn"        id="nb-progress" onclick="showSection('progress')" aria-label="Progress">
       <span class="icon">📊</span><span class="txt">Progress</span>
     </button>
+    <a class="tg-btn" href="https://t.me/YOUR_TELEGRAM" target="_blank" rel="noopener" aria-label="Telegram orqali yordam">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.19l-2.02 9.53c-.15.67-.54.83-1.08.52l-3-2.21-1.45 1.4c-.16.16-.3.3-.61.3l.21-3.03 5.52-4.99c.24-.21-.05-.33-.37-.12L6.37 14.6l-2.95-.92c-.64-.2-.65-.64.13-.95l11.56-4.46c.53-.2 1 .13.83.92z"/></svg>
+      <span class="txt">Yordam</span>
+    </a>
   </div>
 </nav>
 
@@ -200,6 +204,14 @@
     </div>
 
     <div class="flash-wrap">
+      <div class="flash-audio-row">
+        <span>🔊 Avtomatik ovoz:</span>
+        <label class="audio-toggle" aria-label="Avtomatik ovozni yoqish">
+          <input type="checkbox" id="flash-auto-audio" onchange="toggleAutoAudio(this)">
+          <span class="audio-slider"></span>
+        </label>
+        <button class="speak-btn" onclick="speakCurrentFlash()" id="flash-speak-btn" title="Hozirgi kartani o'qib berish">🔊</button>
+      </div>
       <div class="flash-progress-row">
         <div class="flash-meta" id="flash-meta">1 / 300</div>
         <div class="progbar" style="flex:1"><div class="progbar-fill" id="flash-pb" style="width:0%"></div></div>
@@ -243,7 +255,7 @@
       <h2 id="test-title">✏️ Bilimingizni Sinab Ko'ring</h2>
       <p>Test turini tanlang va boshlang</p>
 
-      <div class="test-type-grid" role="radiogroup" aria-label="Test turi">
+      <div class="test-type-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))" role="radiogroup" aria-label="Test turi">
         <div class="ttype-card sel" id="tt-k-meaning" onclick="selTestType('k-meaning')" role="radio" aria-checked="true" tabindex="0">
           <div class="ticon"><span class="jp">漢</span>→📖</div>
           <div class="tlbl">Kanji → Ma'no</div>
@@ -263,6 +275,11 @@
           <div class="ticon">📝→🔤</div>
           <div class="tlbl">Katakana So'z</div>
           <div class="tdesc">Katakana so'zini aniqlang</div>
+        <div class="ttype-card" id="tt-listen" onclick="selTestType('listen')" role="radio" aria-checked="false" tabindex="0">
+          <div class="ticon">🔊→<span class="jp">漢</span></div>
+          <div class="tlbl">Listening Test</div>
+          <div class="tdesc">Ovozni eshitib to'g'ri kanjini toping</div>
+        </div>
         </div>
       </div>
 
@@ -401,6 +418,11 @@
         <button class="modal-nav-btn" onclick="modalNav(-1)" aria-label="Oldingi kanji">← Oldingi</button>
         <button class="modal-nav-btn" onclick="modalNav(1)"  aria-label="Keyingi kanji">Keyingi →</button>
       </div>
+      <div class="modal-speak-row">
+        <button class="speak-big" onclick="speakModal()" id="modal-speak-btn">
+          🔊 Ovozni eshitish (Yapon)
+        </button>
+      </div>
       <button class="learn-btn" id="learn-btn" onclick="toggleLearnModal()">✓ O'rgandim deb belgilash</button>
     </div>
   </div>
@@ -418,8 +440,8 @@
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("/service-worker.js")
-        .then(() => console.log("Service Worker tayyor!"))
-        .catch(err => console.log("Service Worker xato:", err));
+        .then(() => console.log("SW tayyor!"))
+        .catch(err => console.log("SW xato:", err));
     });
   }
 </script>
