@@ -4,43 +4,7 @@
 
 'use strict';
 
-// ============================================================
-//  SPEECH SYNTHESIS (Web Speech API)
-// ============================================================
-const Speech = (() => {
-  const synth = window.speechSynthesis;
-  let jpVoice = null;
-  let available = false;
 
-  function init() {
-    if (!synth) return;
-    const load = () => {
-      const voices = synth.getVoices();
-      jpVoice = voices.find(v => v.lang === 'ja-JP')
-             || voices.find(v => v.lang.startsWith('ja'))
-             || null;
-      available = !!jpVoice;
-    };
-    load();
-    if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = load;
-  }
-
-  function speak(text, { rate = 0.85, pitch = 1.0, onEnd } = {}) {
-    if (!synth || !text) return;
-    synth.cancel();
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang  = 'ja-JP';
-    utt.rate  = rate;
-    utt.pitch = pitch;
-    if (jpVoice) utt.voice = jpVoice;
-    utt.onend   = () => { if (onEnd) onEnd(); };
-    utt.onerror = () => {};
-    synth.speak(utt);
-  }
-
-  function stop() { synth?.cancel(); }
-  return { init, speak, stop, isAvailable: () => available };
-})();
 
 // ============================================================
 //  STATE
@@ -72,8 +36,10 @@ function showSection(id) {
   Speech.stop();
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('s-' + id)?.classList.add('active');
   document.getElementById('nb-' + id)?.classList.add('active');
+  document.getElementById('mn-' + id)?.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (id === 'kanji')    renderKanji();
   if (id === 'katakana') renderKatakana();
@@ -595,10 +561,37 @@ function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.fl
 // ============================================================
 //  INIT
 // ============================================================
-document.addEventListener('DOMContentLoaded',()=>{
+/* ============================================================
+//  TEST SPEECH BUTTON
+// ============================================================ */
+function testSpeechNow() {
+  const testWords = ['こんにちは', 'ありがとう', '日本語', '勉強'];
+  const word = testWords[Math.floor(Math.random() * testWords.length)];
+  Speech.speak(word, {
+    rate: 0.8,
+    force: true,
+    onError: (e) => showToast('⚠️ Ovoz xatosi: ' + e.error + '. Chrome/Edge tavsiya etiladi.')
+  });
+  showToast('🔊 Test: ' + word);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Init speech engine
   Speech.init();
+
+  // After 1s, show voice diagnostic in console
+  setTimeout(() => {
+    const voices = Speech.getVoiceList();
+    const jp = voices.filter(v => v.lang.startsWith('ja'));
+    console.log('%c🔊 Voice diagnostic', 'color:#2563EB;font-weight:700');
+    console.log('Total voices:', voices.length);
+    console.log('Japanese voices:', jp.map(v => v.name + ' (' + v.lang + ')'));
+    if (!voices.length) {
+      console.warn('No voices loaded. Try clicking anywhere on the page first (browser security requirement).');
+    }
+  }, 1000);
+
   document.getElementById('filter-all')?.classList.add('active-filter');
   updateHomeStats();
   renderKanji();
-  setTimeout(()=>{ if(!Speech.isAvailable()) console.warn('Japanese TTS voice not found. Use Chrome/Edge for best experience.'); },600);
 });

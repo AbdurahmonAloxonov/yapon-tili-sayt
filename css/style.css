@@ -711,3 +711,147 @@ input, select, textarea { font-family: var(--ui-font); }
   font-size: 13px; color: var(--dark); font-weight: 600;
   display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
 }
+
+/* ===== MOBILE BOTTOM NAVBAR (Creative idea) ===== */
+@media (max-width: 640px) {
+  /* Top navbar faqat logo va telegram ko'rinadi */
+  .navbar { height: 52px; }
+  .nav-btn { display: none !important; }
+  .tg-btn .txt { display: none; }
+  .tg-btn { padding: 7px 10px; }
+  .nav-logo { font-size: 17px; }
+  .main { padding: 68px 12px 80px; }
+
+  /* Pastki navbar - mobile uchun */
+  .mobile-nav {
+    display: flex !important;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+    justify-content: space-around;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+  }
+
+  .mobile-nav-btn {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; padding: 6px 10px; border-radius: 12px;
+    border: none; background: transparent;
+    font-family: var(--ui-font); cursor: pointer;
+    transition: var(--transition); color: var(--muted);
+    min-width: 52px; flex: 1;
+  }
+  .mobile-nav-btn .mn-icon { font-size: 20px; line-height: 1; }
+  .mobile-nav-btn .mn-txt { font-size: 10px; font-weight: 700; letter-spacing: 0.2px; }
+  .mobile-nav-btn.active {
+    color: var(--pri);
+    background: var(--pri-l);
+  }
+  .mobile-nav-btn .mn-icon.jp { font-family: var(--jp-font); font-size: 18px; }
+}
+
+@media (min-width: 641px) {
+  .mobile-nav { display: none !important; }
+}
+
+/* ===== HERO MOBILE FIX ===== */
+@media (max-width: 480px) {
+  .hero { padding: 24px 16px; margin-bottom: 20px; }
+  .hero h1 { font-size: 22px; }
+  .hero p { font-size: 14px; margin-bottom: 20px; }
+  .hero-stats { gap: 8px; }
+  .hstat { padding: 10px 12px; min-width: 76px; }
+  .hstat .num { font-size: 20px; }
+  .hstat .lbl { font-size: 11px; }
+
+  .daily-banner { padding: 16px; gap: 12px; }
+  .daily-banner .db-icon { font-size: 30px; }
+  .daily-banner h3 { font-size: 15px; }
+  .daily-banner p { font-size: 12px; }
+  .daily-btn { margin-left: 0; width: 100%; text-align: center; }
+
+  .qnav { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .qcard { padding: 16px 12px; }
+  .qcard .icon { font-size: 26px; }
+  .qcard h3 { font-size: 13px; }
+  .qcard p { font-size: 11px; }
+
+  /* Flashcard mobile */
+  .flash-scene { height: 220px; }
+  .flash-front .fchar { font-size: 72px; }
+  .flash-front .fkbd { display: none; }
+  .flash-controls { gap: 8px; }
+  .fc-btn { padding: 10px 12px; font-size: 13px; }
+  .fc-btn.prev span, .fc-btn.next span { display: none; }
+
+  /* Test mobile */
+  .test-q { padding: 18px 14px; min-height: 130px; }
+  .test-q .qchar { font-size: 60px; }
+  .choices { grid-template-columns: 1fr; gap: 8px; }
+  .choice { padding: 14px; font-size: 14px; }
+
+  /* Modal mobile */
+  .modal { border-radius: var(--r-lg) var(--r-lg) 0 0; margin-top: auto; max-height: 85vh; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal-kanji { font-size: 64px; padding: 12px 0; }
+
+  /* Kanji grid mobile */
+  .kanji-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .kcard { padding: 12px 8px; }
+  .kcard .kanji-char { font-size: 36px; }
+  .kcard .kanji-meaning { font-size: 11px; }
+
+  /* Katakana mobile */
+  .kata-chart { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .kata-cell { padding: 10px 4px; }
+  .kata-cell .kchar { font-size: 22px; }
+  .kata-cell .krom { font-size: 10px; }
+
+  /* Test type grid */
+  .test-type-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ttype-card { padding: 14px 10px; }
+  .ttype-card .ticon { font-size: 22px; margin-bottom: 4px; }
+  .ttype-card .tlbl { font-size: 11px; }
+  .ttype-card .tdesc { display: none; }
+
+  /* Search */
+  .search-box { min-width: 100%; max-width: 100%; }
+  .sec-controls { gap: 6px; }
+  .filter-btn { padding: 7px 12px; font-size: 12px; }
+
+  /* Progress */
+  .prog-big-card { padding: 18px 16px; }
+  .prog-rows { grid-template-columns: 1fr; }
+
+  /* Toast pastroq */
+  .toast { bottom: 90px; }
+
+  /* Flash audio row */
+  .flash-audio-row { flex-wrap: wrap; justify-content: center; gap: 6px; }
+
+  /* Pagination */
+  .page-btn { width: 32px; height: 32px; font-size: 12px; }
+}
+
+/* ===== TOUCH IMPROVEMENTS ===== */
+@media (hover: none) {
+  .kcard:hover { transform: none; }
+  .qcard:hover { transform: none; }
+  .word-card:hover { transform: none; }
+  .start-btn:hover { transform: none; }
+  /* Tap highlight */
+  .kcard:active { transform: scale(0.97); background: var(--pri-l); }
+  .qcard:active { transform: scale(0.97); }
+  .choice:active:not(:disabled) { transform: scale(0.97); }
+  .fc-btn:active { transform: scale(0.95); }
+  .mobile-nav-btn:active { transform: scale(0.92); }
+}
+
+/* ===== SWIPE HINT (flashcard) ===== */
+.swipe-hint {
+  text-align: center; font-size: 11px; color: var(--muted);
+  margin-top: 6px; font-weight: 600;
+}
+@media (min-width: 641px) { .swipe-hint { display: none; } }
