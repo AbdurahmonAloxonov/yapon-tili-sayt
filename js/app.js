@@ -177,10 +177,7 @@ function speakModal() {
   if (!k) return;
   const sb = document.getElementById('modal-speak-btn');
   const text = k.ex + '。' + (k.kun!=='—' ? k.kun.replace(/[()（）・]/g,'').split('・')[0] : k.on.split('・')[0]);
-  if (sb) { sb.classList.add('speaking'); sb.textContent='🔊 O\'qilyapti...'; }
-  Speech.speak(text, { rate: 0.8, onEnd: () => {
-    if (sb) { sb.classList.remove('speaking'); sb.textContent='🔊 Ovozni eshitish (Yapon)'; }
-  }});
+  Speech.speakWithBtn(text, sb);
 }
 
 function toggleLearnModal() {
@@ -362,7 +359,7 @@ function speakCurrentFlash() {
   const k=state.flashDeck?.[state.flashIdx]; if (!k) return;
   const btn=document.getElementById('flash-speak-btn');
   if (btn) btn.classList.add('speaking');
-  Speech.speak(k.k, {rate:0.75, onEnd:()=>btn?.classList.remove('speaking')});
+  Speech.speakWithBtn(k.k, btn);
 }
 
 // ============================================================
@@ -567,12 +564,8 @@ function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.fl
 function testSpeechNow() {
   const testWords = ['こんにちは', 'ありがとう', '日本語', '勉強'];
   const word = testWords[Math.floor(Math.random() * testWords.length)];
-  Speech.speak(word, {
-    rate: 0.8,
-    force: true,
-    onError: (e) => showToast('⚠️ Ovoz xatosi: ' + e.error + '. Chrome/Edge tavsiya etiladi.')
-  });
   showToast('🔊 Test: ' + word);
+  Speech.speak(word);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "yapon-tili-v3";
+const CACHE_NAME = "yapon-tili-v4";
 
 const FILES_TO_CACHE = [
   "/",

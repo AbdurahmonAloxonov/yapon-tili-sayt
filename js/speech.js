@@ -1,181 +1,130 @@
 /* ============================================================
-   speech.js — Android & iOS uchun moslashtirilgan TTS
+   speech.js — Google Translate TTS (Android/iOS uchun ishonchli)
+   Web Speech API EMAS — Audio element orqali ishlaydi
    ============================================================ */
 
 'use strict';
 
 const Speech = (() => {
-  const synth = window.speechSynthesis;
-  let jpVoice   = null;
-  let allVoices = [];
-  let ready     = false;
-  let userInteracted = false;
-  let pendingSpeak   = null;
+  let currentAudio = null;
+  let speakingBtn  = null;
 
-  /* ── 1. User interaction kuzatish ── */
-  function markInteraction() {
-    if (userInteracted) return;
-    userInteracted = true;
-    // Agar pending speak bo'lsa, endi bajar
-    if (pendingSpeak) {
-      const fn = pendingSpeak;
-      pendingSpeak = null;
-      setTimeout(fn, 100);
-    }
+  /* ── Google Translate TTS URL ── */
+  function getTTSUrl(text) {
+    const encoded = encodeURIComponent(text);
+    return `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=ja&client=tw-ob`;
   }
 
-  // Har qanday touch/click da flag o'rnatiladi
-  document.addEventListener('touchstart', markInteraction, { once: true, passive: true });
-  document.addEventListener('click',      markInteraction, { once: true });
-  document.addEventListener('keydown',    markInteraction, { once: true });
-
-  /* ── 2. Ovozlarni yuklash ── */
-  function loadVoices() {
-    if (!synth) return;
-    allVoices = synth.getVoices();
-
-    // Eng yaxshi yapon ovozini topish
-    jpVoice =
-      allVoices.find(v => v.lang === 'ja-JP' && v.localService) ||
-      allVoices.find(v => v.lang === 'ja-JP') ||
-      allVoices.find(v => v.lang.startsWith('ja')) ||
-      null;
-
-    ready = allVoices.length > 0;
-    if (ready) updateIndicator(true);
-  }
-
-  /* ── 3. Init ── */
-  function init() {
-    if (!synth) {
-      updateIndicator(false);
-      return;
-    }
-
-    loadVoices();
-    synth.onvoiceschanged = loadVoices;
-
-    // Android uchun polling
-    let attempts = 0;
-    const poll = setInterval(() => {
-      attempts++;
-      loadVoices();
-      if (ready || attempts >= 30) clearInterval(poll);
-    }, 300);
-  }
-
-  /* ── 4. Android Chrome bug workaround ── */
-  function androidResume() {
-    if (!synth) return;
-    // Android Chrome da synth o'zicha to'xtab qoladi — har 10s resume
-    const timer = setInterval(() => {
-      if (!synth.speaking) { clearInterval(timer); return; }
-      synth.pause();
-      synth.resume();
-    }, 10000);
-    return timer;
-  }
-
-  /* ── 5. Core speak ── */
+  /* ── Asosiy speak funksiya ── */
   function speak(text, opts = {}) {
-    if (!synth || !text) return;
+    if (!text) return;
+    const { onEnd = null, onError = null } = opts;
 
-    const {
-      rate    = 0.80,
-      pitch   = 1.0,
-      onEnd   = null,
-      onError = null,
-      force   = false,
-    } = opts;
+    // Oldingi audioni to'xtatish
+    stop();
 
-    // User interaksiya bo'lmasa kutish
-    if (!userInteracted && !force) {
-      pendingSpeak = () => _doSpeak(text, rate, pitch, onEnd, onError);
-      // Baribir urinib ko'rish
-      _doSpeak(text, rate, pitch, onEnd, onError);
-      return;
-    }
+    const url   = getTTSUrl(text);
+    const audio = new Audio(url);
+    audio.crossOrigin = 'anonymous';
+    currentAudio = audio;
 
-    _doSpeak(text, rate, pitch, onEnd, onError);
+    audio.onended = () => {
+      resetBtn();
+      if (onEnd) onEnd();
+    };
+
+    audio.onerror = () => {
+      // Google TTS CORS blok qilsa — Web Speech API ga fallback
+      console.warn('Google TTS xato — Web Speech fallback');
+      resetBtn();
+      fallbackSpeak(text, opts);
+      if (onError) onError();
+    };
+
+    audio.play().catch(() => {
+      resetBtn();
+      fallbackSpeak(text, opts);
+    });
   }
 
-  function _doSpeak(text, rate, pitch, onEnd, onError) {
-    try {
-      if (synth.speaking) synth.cancel();
+  /* ── Fallback: Web Speech API ── */
+  function fallbackSpeak(text, opts = {}) {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    if (synth.speaking) synth.cancel();
 
-      setTimeout(() => {
-        try {
-          const utt = new SpeechSynthesisUtterance(text);
-          utt.lang  = 'ja-JP';
-          utt.rate  = rate;
-          utt.pitch = pitch;
-          if (jpVoice) utt.voice = jpVoice;
-
-          utt.onstart = () => {
-            // Android bug workaround
-            androidResume();
-          };
-
-          utt.onend = () => {
-            if (onEnd) onEnd();
-          };
-
-          utt.onerror = (e) => {
-            if (e.error !== 'interrupted' && e.error !== 'canceled') {
-              console.warn('TTS xato:', e.error, '| Matn:', text);
-              if (onError) onError(e);
-              updateIndicator(false, e.error);
-            }
-          };
-
-          synth.speak(utt);
-
-          // Chrome/Android freeze bug fix
-          setTimeout(() => {
-            if (synth.paused) synth.resume();
-          }, 200);
-
-        } catch(err) {
-          console.warn('TTS exception:', err);
-        }
-      }, synth.speaking ? 100 : 20);
-
-    } catch(err) {
-      console.warn('Speech cancel error:', err);
-    }
+    setTimeout(() => {
+      const utt   = new SpeechSynthesisUtterance(text);
+      utt.lang    = 'ja-JP';
+      utt.rate    = opts.rate || 0.80;
+      utt.pitch   = 1.0;
+      const jpVoice = synth.getVoices().find(v => v.lang.startsWith('ja'));
+      if (jpVoice) utt.voice = jpVoice;
+      utt.onend   = () => { if (opts.onEnd) opts.onEnd(); };
+      utt.onerror = (e) => { if (e.error !== 'interrupted') console.warn('TTS xato:', e.error); };
+      synth.speak(utt);
+      if (synth.paused) synth.resume();
+    }, 50);
   }
 
+  /* ── To'xtatish ── */
   function stop() {
-    try {
-      if (synth && (synth.speaking || synth.pending)) synth.cancel();
-    } catch(e) {}
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.src = '';
+      currentAudio = null;
+    }
+    if (window.speechSynthesis?.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    resetBtn();
   }
 
-  function isAvailable() { return !!synth; }
-  function hasJpVoice()  { return !!jpVoice; }
-  function getVoiceList(){ return allVoices; }
+  function resetBtn() {
+    if (speakingBtn) {
+      speakingBtn.classList.remove('speaking');
+      if (speakingBtn.dataset.orig) {
+        speakingBtn.textContent = speakingBtn.dataset.orig;
+      }
+      speakingBtn = null;
+    }
+  }
 
-  /* ── 6. UI holat ko'rsatgich ── */
-  function updateIndicator(ok, errMsg) {
+  /* ── Tugma bilan ishlatish ── */
+  function speakWithBtn(text, btn, opts = {}) {
+    if (!text) return;
+    speakingBtn = btn;
+    if (btn) {
+      btn.dataset.orig = btn.textContent;
+      btn.classList.add('speaking');
+      btn.textContent  = '⏸ O\'qilyapti...';
+    }
+    speak(text, {
+      ...opts,
+      onEnd:   () => { resetBtn(); if (opts.onEnd)   opts.onEnd();   },
+      onError: () => { resetBtn(); if (opts.onError) opts.onError(); }
+    });
+  }
+
+  /* ── Init (Web Speech voices yuklash) ── */
+  function init() {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+    updateIndicator(true);
+  }
+
+  function isAvailable()  { return true; }
+  function hasJpVoice()   { return true; }
+  function getVoiceList() { return []; }
+
+  function updateIndicator(ok) {
     const el = document.getElementById('speech-status');
     if (!el) return;
-    if (!synth) {
-      el.textContent = '🔇 Ovoz qo\'llab-quvvatlanmaydi';
-      el.style.color = 'var(--red)';
-    } else if (errMsg) {
-      el.textContent = '⚠️ Xato: ' + errMsg;
-      el.style.color = 'var(--red)';
-    } else if (ok && jpVoice) {
-      el.textContent = '✅ Yapon ovozi tayyor';
-      el.style.color = 'var(--sec)';
-    } else if (ok) {
-      el.textContent = '🔊 Standart ovoz (Yapon ovozi topilmadi)';
-      el.style.color = 'var(--acc)';
-    } else {
-      el.textContent = '⏳ Ovoz yuklanmoqda... (ekranga teging)';
-      el.style.color = 'var(--muted)';
-    }
+    el.textContent = ok ? '✅ Ovoz tayyor (Google TTS)' : '🔇 Ovoz mavjud emas';
+    el.style.color = ok ? 'var(--sec)' : 'var(--red)';
   }
 
-  return { init, speak, stop, isAvailable, hasJpVoice, getVoiceList };
+  return { init, speak, speakWithBtn, stop, isAvailable, hasJpVoice, getVoiceList };
 })();
