@@ -18,6 +18,8 @@ const state = {
   flashType: 'kanji', flashIdx: 0, flashFlipped: false, flashDeck: [],
   testType: 'k-meaning', testQ: [], testIdx: 0, testCorrect: 0, testWrong: 0,
   currentModal: null, listenText: '',
+  hiraTab: 'chart',
+  learnedHira: new Set(JSON.parse(localStorage.getItem('lhira') || '[]')),
 };
 
 function save() {
@@ -46,6 +48,9 @@ function showSection(id) {
   if (id === 'flash')    initFlash();
   if (id === 'progress') renderProgress();
   if (id === 'home')     updateHomeStats();
+  if (id === 'hiragana') renderHiragana();
+  if (id === 'stories')  renderStories();
+  if (id === 'srs')      initSRS();
   if (id === 'test') {
     document.getElementById('test-setup').style.display = '';
     document.getElementById('test-area').style.display  = 'none';
@@ -588,3 +593,301 @@ document.addEventListener('DOMContentLoaded', () => {
   updateHomeStats();
   renderKanji();
 });
+
+// ============================================================
+//  HIRAGANA
+// ============================================================
+function renderHiragana() {
+  setText('hira-badge', state.learnedHira.size + " / 46 o'rganildi");
+  if (state.hiraTab === 'chart') renderHiraChart(); else renderHiraWords();
+}
+
+function setHiraTab(t) {
+  state.hiraTab = t;
+  document.getElementById('hira-chart-section').style.display = t === 'chart' ? '' : 'none';
+  document.getElementById('hira-words-section').style.display = t === 'words' ? '' : 'none';
+  document.querySelectorAll('#s-hiragana .tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('ht-' + t)?.classList.add('active');
+  if (t === 'chart') renderHiraChart(); else renderHiraWords();
+}
+
+function renderHiraChart() {
+  const q = (document.getElementById('hira-search')?.value || '').toLowerCase().trim();
+  const wrap = document.getElementById('hira-chart-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  HIRA_CHART.forEach(row => {
+    const filtered = row.chars.filter(c => !q || c.c.includes(q) || c.r.toLowerCase().includes(q));
+    if (!filtered.length) return;
+    const title = document.createElement('div');
+    title.className = 'kata-section-title'; title.textContent = row.row; wrap.appendChild(title);
+    const grid = document.createElement('div'); grid.className = 'kata-chart';
+    filtered.forEach(c => {
+      const learned = state.learnedHira.has(c.c);
+      const div = document.createElement('div');
+      div.className = 'kata-cell' + (learned ? ' learned' : '');
+      div.setAttribute('role', 'button');
+      div.innerHTML = `<span class="kchar">${c.c}</span><span class="krom">${c.r}</span>`;
+      div.addEventListener('click', () => {
+        Speech.speak(c.c, { rate: 0.75 });
+        if (!state.learnedHira.has(c.c)) {
+          state.learnedHira.add(c.c); saveHira();
+          div.classList.add('learned');
+          showToast('✓ ' + c.c + ' (' + c.r + ") — O'rganildi!");
+          setText('hira-badge', state.learnedHira.size + " / 46 o'rganildi");
+        } else { showToast(c.c + ' — ' + c.r); }
+      });
+      grid.appendChild(div);
+    });
+    wrap.appendChild(grid);
+  });
+}
+
+function renderHiraWords() {
+  const q = (document.getElementById('hira-word-search')?.value || '').toLowerCase().trim();
+  const filtered = HIRA_WORDS.filter(w => !q || w.w.includes(q) || w.r.toLowerCase().includes(q) || w.m.toLowerCase().includes(q));
+  const grid = document.getElementById('hira-words-grid');
+  if (!grid) return;
+  if (!filtered.length) { grid.innerHTML = '<div class="no-results" style="grid-column:1/-1">🔍 Hech narsa topilmadi</div>'; return; }
+  grid.innerHTML = filtered.map(w => `
+    <div class="word-card" role="button">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+        <div style="flex:1">
+          <div class="wkata">${w.w}</div>
+          <div class="wpron">${w.r}</div>
+          <div class="wmean">${w.m}</div>
+        </div>
+        <button class="speak-btn speak-sm" onclick="Speech.speak('${escAttr(w.w)}',{rate:0.75})" title="Ovozini eshitish">🔊</button>
+      </div>
+    </div>`).join('');
+}
+
+function saveHira() {
+  try { localStorage.setItem('lhira', JSON.stringify([...state.learnedHira])); } catch(e) {}
+}
+
+// ============================================================
+//  STORIES
+// ============================================================
+function renderStories() {
+  const list = document.getElementById('story-list');
+  if (!list) return;
+  list.innerHTML = STORIES.map((story, si) => `
+    <div class="story-card">
+      <div class="story-header">
+        <div>
+          <h3 class="story-title">${story.title}</h3>
+          <div class="story-sub jp">${story.titleJp}</div>
+        </div>
+        <span class="sec-badge" style="align-self:flex-start">${story.level}</span>
+      </div>
+      <div class="story-text">
+        ${story.words.map((w, wi) =>
+          w.jp === '。' || w.jp === '、' || w.jp === ''
+            ? `<span class="story-punct">${w.jp}</span>`
+            : `<span class="story-word jp" data-story="${si}" data-word="${wi}" onclick="showWordTip(this,${si},${wi})">${w.jp}</span>`
+        ).join('')}
+      </div>
+      <div class="story-tooltip" id="stt-${si}" style="display:none"></div>
+      <details class="story-translation">
+        <summary>📋 O'zbek tarjimasi</summary>
+        <p style="margin-top:8px;color:var(--muted);line-height:1.7">${story.translation}</p>
+      </details>
+      <button class="speak-btn" style="margin-top:10px;width:100%;justify-content:center;gap:6px;padding:8px"
+        onclick="Speech.speak('${escAttr(story.words.map(w=>w.jp).join(''))}',{rate:0.75})">
+        🔊 Hikoyani eshitish
+      </button>
+    </div>`).join('');
+}
+
+function showWordTip(el, si, wi) {
+  const word = STORIES[si].words[wi];
+  if (!word || !word.jp) return;
+  const tt = document.getElementById('stt-' + si);
+  if (!tt) return;
+  // deselect all in this story
+  el.closest('.story-card').querySelectorAll('.story-word').forEach(w => w.classList.remove('active-word'));
+  el.classList.add('active-word');
+  tt.style.display = 'block';
+  tt.innerHTML = `<span class="jp" style="font-size:20px;font-weight:700">${word.jp}</span>
+    <span style="color:var(--muted);margin:0 6px">·</span>
+    <span style="color:var(--sec);font-weight:600">${word.r}</span>
+    <span style="color:var(--muted);margin:0 6px">—</span>
+    <span>${word.m}</span>
+    <button onclick="Speech.speak('${escAttr(word.jp)}',{rate:0.75})" style="margin-left:8px;background:none;border:none;cursor:pointer;font-size:16px">🔊</button>`;
+}
+
+// ============================================================
+//  SRS — Spaced Repetition System
+// ============================================================
+const SRS_INTERVALS = [0, 1, 3, 7]; // kunlar (0 = 1 soat)
+
+function srsLoad() {
+  try { return JSON.parse(localStorage.getItem('srs_data') || '{}'); } catch(e) { return {}; }
+}
+function srsSave(data) {
+  try { localStorage.setItem('srs_data', JSON.stringify(data)); } catch(e) {}
+}
+
+function getSrsQueue() {
+  const data = srsLoad();
+  const now = Date.now();
+  // Build all cards from kanji + katakana
+  const allCards = [
+    ...KANJI_DATA.map(k => ({ id: 'k_' + k.k, front: k.k, meaning: k.m, reading: k.on + (k.kun && k.kun !== '—' ? ' / ' + k.kun : ''), example: k.ex + ' — ' + k.em })),
+    ...(() => { const a = []; KATA_CHART.forEach(r => r.chars.forEach(c => a.push({ id: 'ka_' + c.c, front: c.c, meaning: c.r, reading: c.r, example: '' }))); return a; })(),
+  ];
+  // Filter: only learned cards, or cards never seen (first time)
+  return allCards.filter(card => {
+    const rec = data[card.id];
+    if (!rec) {
+      // Only show if it's been "unlocked" (learned in kanji/kata section)
+      const isLearnedK = state.learnedK.has(card.front);
+      const isLearnedKA = state.learnedKA.has(card.front);
+      return isLearnedK || isLearnedKA;
+    }
+    return rec.nextReview <= now;
+  });
+}
+
+let srsQueue = [], srsIdx = 0, srsFlipped = false;
+
+function initSRS() {
+  srsQueue = getSrsQueue();
+  shuffle(srsQueue);
+  srsIdx = 0; srsFlipped = false;
+  renderSrsStats();
+  if (!srsQueue.length) {
+    document.getElementById('srs-card-area').style.display = 'none';
+    document.getElementById('srs-empty').style.display = '';
+  } else {
+    document.getElementById('srs-card-area').style.display = '';
+    document.getElementById('srs-empty').style.display = 'none';
+    showSrsCard();
+  }
+}
+
+function renderSrsStats() {
+  const data = srsLoad();
+  const total = [...state.learnedK, ...state.learnedKA].length;
+  const due = srsQueue.length;
+  const mastered = Object.values(data).filter(r => r.interval >= 7).length;
+  const row = document.getElementById('srs-stats-row');
+  if (!row) return;
+  row.innerHTML = `
+    <div class="srs-stat"><div class="srs-stat-num">${due}</div><div class="srs-stat-lbl">Bugun takrorlash</div></div>
+    <div class="srs-stat"><div class="srs-stat-num">${total}</div><div class="srs-stat-lbl">Jami kartalar</div></div>
+    <div class="srs-stat"><div class="srs-stat-num" style="color:var(--green)">${mastered}</div><div class="srs-stat-lbl">O'zlashtirilgan</div></div>`;
+}
+
+function showSrsCard() {
+  const card = srsQueue[srsIdx];
+  if (!card) { initSRS(); return; }
+  srsFlipped = false;
+  document.getElementById('srs-card')?.classList.remove('flipped');
+  document.getElementById('srs-answer-btns').style.display = 'none';
+  setText('srs-front', card.front);
+  setText('srs-back-meaning', card.meaning);
+  setText('srs-back-reading', card.reading);
+  setHTML('srs-back-example', card.example ? `<span class="jp">${card.example}</span>` : '');
+  setText('srs-queue-lbl', `Navbat: ${srsQueue.length - srsIdx} ta`);
+  setText('srs-card-num', `${srsIdx + 1} / ${srsQueue.length}`);
+}
+
+function srsFlip() {
+  if (srsFlipped) return;
+  srsFlipped = true;
+  document.getElementById('srs-card')?.classList.add('flipped');
+  setTimeout(() => { document.getElementById('srs-answer-btns').style.display = ''; }, 300);
+}
+
+function srsAnswer(quality) {
+  const card = srsQueue[srsIdx]; if (!card) return;
+  const data = srsLoad();
+  const now = Date.now();
+  const intervalDays = quality === 0 ? 0 : SRS_INTERVALS[quality];
+  const nextMs = intervalDays === 0 ? now + 60 * 60 * 1000 : now + intervalDays * 24 * 60 * 60 * 1000;
+  data[card.id] = { nextReview: nextMs, interval: intervalDays, lastQuality: quality };
+  srsSave(data);
+  const msgs = ['💪 Tushundik, keyinroq qayta ko\'rsatamiz', '📝 1 kundan keyin qayta ko\'rsatamiz', '✅ Yaxshi! 3 kundan keyin', '🌟 Zo\'r! 7 kundan keyin'];
+  showToast(msgs[quality]);
+  srsIdx++;
+  if (srsIdx >= srsQueue.length) { initSRS(); return; }
+  showSrsCard();
+}
+
+// ============================================================
+//  AI MULOQOT
+// ============================================================
+let aiHistory = [];
+
+function aiInsert(text) {
+  const inp = document.getElementById('ai-input');
+  if (inp) { inp.value = text; inp.focus(); }
+}
+
+function aiKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
+}
+
+async function aiSend() {
+  const inp = document.getElementById('ai-input');
+  const text = inp?.value?.trim();
+  if (!text) return;
+  inp.value = '';
+  const sendBtn = document.getElementById('ai-send-btn');
+  if (sendBtn) sendBtn.disabled = true;
+
+  aiAddMsg('user', text);
+  aiHistory.push({ role: 'user', content: text });
+
+  const thinkingId = 'ai-think-' + Date.now();
+  aiAddMsg('assistant', '⏳ Javob tayyorlanmoqda...', thinkingId);
+
+  const systemPrompt = `Siz yapon tili o'qituvchisisiz. Foydalanuvchi yapon tilida yozadi.
+Siz:
+1. Xatolar bo'lsa, to'g'ri variantini ko'rsating
+2. Har bir gapni o'zbek tiliga tarjima qiling
+3. Muhim so'zlarni tushuntiring (kanji, grammatika)
+4. Qisqa, aniq, do'stona tonda javob bering
+5. Javobingiz o'zbek tilida bo'lsin, yapon misollar uchun yapon yozuvi ishlatilsin
+Maksimal 200 so'z.`;
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: systemPrompt,
+        messages: aiHistory
+      })
+    });
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'Xatolik yuz berdi.';
+    aiHistory.push({ role: 'assistant', content: reply });
+    const thinkEl = document.getElementById(thinkingId);
+    if (thinkEl) thinkEl.querySelector('.ai-msg-text').innerHTML = formatAiReply(reply);
+    else aiAddMsg('assistant', formatAiReply(reply));
+  } catch (err) {
+    const thinkEl = document.getElementById(thinkingId);
+    if (thinkEl) thinkEl.querySelector('.ai-msg-text').textContent = '❌ Xatolik: ' + err.message;
+  }
+  if (sendBtn) sendBtn.disabled = false;
+}
+
+function formatAiReply(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function aiAddMsg(role, content, id) {
+  const box = document.getElementById('ai-chat-box');
+  if (!box) return;
+  const div = document.createElement('div');
+  div.className = 'ai-msg ai-' + role;
+  if (id) div.id = id;
+  div.innerHTML = `<span class="ai-msg-text">${role === 'user' ? escHtml(content) : content}</span>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
