@@ -1,7 +1,10 @@
 /* ============================================================
-   YAPON TILI — ai.js  (Gemini API — xavfsiz versiya)
+   YAPON TILI — ai.js  (Gemini API)
    ============================================================ */
 'use strict';
+
+// ⬇️ SHU YERGA O'Z KALITINGIZNI YOZING
+const API_KEY = 'AIzaSyCv-wcmEu0O7zochkRaUTZZ6RaciPBkoGk';
 
 const AI = (() => {
   const messages = [];
@@ -48,20 +51,28 @@ Bu saytda 300 ta JLPT N4 kanji va katakana o'rgatiladi.`;
     const text = inp.value.trim();
     if (!text) return;
 
+    if (API_KEY === 'BU_YERGA_KALITINGIZNI_YOZING') {
+      renderMsg('assistant', '⚠️ ai.js faylida API_KEY ni to\'ldiring.');
+      return;
+    }
+
     inp.value = ''; inp.disabled = true; el('ai-send').disabled = true;
     messages.push({ role: 'user', parts: [{ text }] });
     renderMsg('user', text);
     showTyping();
 
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: SYSTEM_PROMPT,
-          messages: messages.slice(-10)
-        })
-      });
+      const res = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents: messages.slice(-10)
+          })
+        }
+      );
       const data = await res.json();
       hideTyping();
       if (data.candidates && data.candidates[0]) {
@@ -69,7 +80,7 @@ Bu saytda 300 ta JLPT N4 kanji va katakana o'rgatiladi.`;
         messages.push({ role: 'model', parts: [{ text: reply }] });
         renderMsg('assistant', reply);
       } else {
-        renderMsg('assistant', '❌ Xato: ' + (data.error ? data.error.message : JSON.stringify(data.error)));
+        renderMsg('assistant', '❌ Xato: ' + (data.error ? data.error.message : 'Qayta urinib ko\'ring'));
       }
     } catch(err) {
       hideTyping();
