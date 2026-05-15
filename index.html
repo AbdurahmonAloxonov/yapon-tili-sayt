@@ -44,20 +44,11 @@
     <button class="nav-btn"        id="nb-test"     onclick="showSection('test')"     aria-label="Test">
       <span class="icon">✏️</span><span class="txt">Test</span>
     </button>
-    <button class="nav-btn"        id="nb-hiragana" onclick="showSection('hiragana')" aria-label="Hiragana bo'limi">
-      <span class="icon jp" style="font-size:16px">あ</span><span class="txt">Hiragana</span>
-    </button>
-    <button class="nav-btn"        id="nb-stories"  onclick="showSection('stories')"  aria-label="Mini hikoyalar">
-      <span class="icon">📖</span><span class="txt">Hikoyalar</span>
-    </button>
-    <button class="nav-btn"        id="nb-srs"      onclick="showSection('srs')"      aria-label="SRS takrorlash">
-      <span class="icon">🧠</span><span class="txt">SRS</span>
-    </button>
-    <button class="nav-btn"        id="nb-ai"       onclick="showSection('ai')"       aria-label="AI muloqot">
-      <span class="icon">🤖</span><span class="txt">AI</span>
-    </button>
     <button class="nav-btn"        id="nb-progress" onclick="showSection('progress')" aria-label="Progress">
       <span class="icon">📊</span><span class="txt">Progress</span>
+    </button>
+    <button class="nav-btn nav-btn--ai" id="nb-ai" onclick="showSection('ai')" aria-label="AI Sensei">
+      <span class="icon">🤖</span><span class="txt">AI Sensei</span>
     </button>
     <a class="tg-btn" href="https://t.me/abdurahmon_fn" target="_blank" rel="noopener" aria-label="Telegram orqali yordam">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.19l-2.02 9.53c-.15.67-.54.83-1.08.52l-3-2.21-1.45 1.4c-.16.16-.3.3-.61.3l.21-3.03 5.52-4.99c.24-.21-.05-.33-.37-.12L6.37 14.6l-2.95-.92c-.64-.2-.65-.64.13-.95l11.56-4.46c.53-.2 1 .13.83.92z"/></svg>
@@ -408,119 +399,35 @@
   </section>
   <!-- END PROGRESS -->
 
-  <!-- ==================== HIRAGANA ==================== -->
-  <section class="section" id="s-hiragana" aria-labelledby="hiragana-title">
-    <div class="sec-head">
-      <h2 id="hiragana-title"><span class="jp">ひらがな</span> Hiragana</h2>
-      <div class="sec-badge" id="hira-badge">0 / 46 o'rganildi</div>
-    </div>
-    <div class="tabs" role="tablist">
-      <button class="tab active" id="ht-chart" onclick="setHiraTab('chart')" role="tab">📊 Jadval</button>
-      <button class="tab"        id="ht-words" onclick="setHiraTab('words')" role="tab">📝 So'zlar</button>
-    </div>
-    <div id="hira-chart-section" role="tabpanel">
-      <div class="sec-controls">
-        <div class="search-box">
-          <span class="s-icon" aria-hidden="true">🔍</span>
-          <input type="search" id="hira-search" placeholder="Hiragana yoki o'qilish qidirish..." oninput="renderHiraChart()" autocomplete="off">
-        </div>
-      </div>
-      <div id="hira-chart-wrap"></div>
-    </div>
-    <div id="hira-words-section" style="display:none" role="tabpanel">
-      <div class="sec-controls">
-        <div class="search-box">
-          <span class="s-icon" aria-hidden="true">🔍</span>
-          <input type="search" id="hira-word-search" placeholder="So'z qidirish..." oninput="renderHiraWords()" autocomplete="off">
-        </div>
-      </div>
-      <div class="word-grid" id="hira-words-grid"></div>
-    </div>
-  </section>
-  <!-- END HIRAGANA -->
-
-  <!-- ==================== STORIES ==================== -->
-  <section class="section" id="s-stories" aria-labelledby="stories-title">
-    <div class="sec-head">
-      <h2 id="stories-title">📖 Mini Hikoyalar</h2>
-      <div class="sec-badge">N4 darajasi</div>
-    </div>
-    <p style="color:var(--muted);font-size:14px;margin-bottom:16px">So'z ustiga bosing — tarjimasini ko'rasiz.</p>
-    <div class="story-list" id="story-list"></div>
-  </section>
-  <!-- END STORIES -->
-
-  <!-- ==================== SRS ==================== -->
-  <section class="section" id="s-srs" aria-labelledby="srs-title">
-    <div class="sec-head">
-      <h2 id="srs-title">🧠 Spaced Repetition</h2>
-    </div>
-    <div class="srs-stats-row" id="srs-stats-row"></div>
-    <div id="srs-empty" style="display:none;text-align:center;padding:40px 20px">
-      <div style="font-size:48px;margin-bottom:12px">🎉</div>
-      <h3>Bugun hammasi takrorlandi!</h3>
-      <p style="color:var(--muted);margin-top:8px">Ertaga qayta keling — yangi kartalar tayyor bo'ladi.</p>
-    </div>
-    <div id="srs-card-area">
-      <div class="srs-meta-row">
-        <span id="srs-queue-lbl" style="font-size:14px;color:var(--muted)">Navbat: 0</span>
-        <div style="flex:1"></div>
-        <span id="srs-card-num" style="font-size:14px;color:var(--muted)"></span>
-      </div>
-      <div class="flash-scene" onclick="srsFlip()" role="button" tabindex="0" style="margin-top:0">
-        <div class="flash-card" id="srs-card">
-          <div class="flash-front">
-            <div class="fchar jp" id="srs-front">—</div>
-            <div class="fhint">↻ Bosib javobni ko'ring</div>
-          </div>
-          <div class="flash-back">
-            <div class="bmeaning" id="srs-back-meaning">—</div>
-            <div class="breading jp" id="srs-back-reading">—</div>
-            <div class="bexample" id="srs-back-example"></div>
-          </div>
-        </div>
-      </div>
-      <div id="srs-answer-btns" style="display:none;margin-top:16px">
-        <p style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:10px">Qanchalik yaxshi bildingiz?</p>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button class="fc-btn prev" onclick="srsAnswer(0)">😕 Bilmadim<br><small>1 soatdan keyin</small></button>
-          <button class="fc-btn flip" onclick="srsAnswer(1)">🤔 Qiyin<br><small>1 kundan keyin</small></button>
-          <button class="fc-btn mark" onclick="srsAnswer(2)">🙂 Yaxshi<br><small>3 kundan keyin</small></button>
-          <button class="fc-btn next" onclick="srsAnswer(3)">😄 Oson!<br><small>7 kundan keyin</small></button>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- END SRS -->
-
-  <!-- ==================== AI MULOQOT ==================== -->
+  <!-- ==================== AI SENSEI ==================== -->
   <section class="section" id="s-ai" aria-labelledby="ai-title">
-    <div class="sec-head">
-      <h2 id="ai-title">🤖 AI bilan Yapon tilida Mashq</h2>
-    </div>
-    <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Yapon tilida yozing — AI xatolaringizni tuzatib, tarjima va izoh beradi.</p>
-    <div class="ai-chat-box" id="ai-chat-box">
-      <div class="ai-msg ai-system">
-        <span>Salom! Men yapon tili o'qituvchisiman. Yapon tilida yozing — xatolaringizni tuzatib, o'zbek tilida izoh beraman. Misol: <span class="jp">今日はいい天気ですね。</span></span>
+    <div class="ai-wrap">
+      <div class="ai-header">
+        <div class="ai-header-left">
+          <div class="ai-logo">先</div>
+          <div>
+            <h2 id="ai-title">AI Sensei</h2>
+            <p>Yapon tili bo'yicha savol-javob</p>
+          </div>
+        </div>
+        <div class="ai-status"><span class="ai-dot"></span>Online</div>
       </div>
-    </div>
-    <div class="ai-input-row">
-      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-        <button class="filter-btn" onclick="aiInsert('こんにちは')">こんにちは</button>
-        <button class="filter-btn" onclick="aiInsert('私は学生です。')">私は学生です</button>
-        <button class="filter-btn" onclick="aiInsert('今日は天気がいいです。')">天気がいい</button>
-        <button class="filter-btn" onclick="aiInsert('すみません、わかりません。')">わかりません</button>
+      <div class="ai-messages" id="ai-messages"></div>
+      <div class="ai-quick">
+        <button class="ai-quick-btn" onclick="AI.askQuick('悪 kanji qanday o\'qiladi?')">悪 qanday o'qiladi?</button>
+        <button class="ai-quick-btn" onclick="AI.askQuick('JLPT N4 grammatika qoidalari nimalar?')">N4 grammatika</button>
+        <button class="ai-quick-btn" onclick="AI.askQuick('Yapon tilida salomlashish jumlalarini o\'rgat')">Salomlashish</button>
+        <button class="ai-quick-btn" onclick="AI.askQuick('Kanji o\'rganish uchun maslahat ber')">💡 Maslahat</button>
       </div>
-      <div style="display:flex;gap:8px">
-        <textarea id="ai-input" class="ai-textarea" placeholder="Yapon tilida yozing... (misol: 今日は忙しいです)" rows="2" onkeydown="aiKeydown(event)"></textarea>
-        <button class="start-btn" onclick="aiSend()" id="ai-send-btn" style="padding:10px 18px;min-width:70px;font-size:14px">Yuborish</button>
+      <div class="ai-input-row">
+        <input id="ai-input" type="text" placeholder="Savol yozing... (masalan: 水 kanji nima degani?)" autocomplete="off" />
+        <button id="ai-send" class="ai-send-btn" onclick="AI.send()" aria-label="Yuborish">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
-      <p style="font-size:12px;color:var(--muted);margin-top:6px">💡 Enter — yuborish &nbsp;|&nbsp; Shift+Enter — yangi qator</p>
     </div>
   </section>
-  <!-- END AI -->
-
-
+  <!-- END AI SENSEI -->
 </main>
 <!-- END MAIN -->
 
@@ -579,20 +486,11 @@
   <button class="mobile-nav-btn"        id="mn-test"     onclick="showSection('test')"     aria-label="Test">
     <span class="mn-icon">✏️</span><span class="mn-txt">Test</span>
   </button>
-  <button class="mobile-nav-btn"        id="mn-hiragana" onclick="showSection('hiragana')" aria-label="Hiragana">
-    <span class="mn-icon jp">あ</span><span class="mn-txt">Hiragana</span>
-  </button>
-  <button class="mobile-nav-btn"        id="mn-stories"  onclick="showSection('stories')"  aria-label="Hikoyalar">
-    <span class="mn-icon">📖</span><span class="mn-txt">Hikoyalar</span>
-  </button>
-  <button class="mobile-nav-btn"        id="mn-srs"      onclick="showSection('srs')"      aria-label="SRS">
-    <span class="mn-icon">🧠</span><span class="mn-txt">SRS</span>
-  </button>
-  <button class="mobile-nav-btn"        id="mn-ai"       onclick="showSection('ai')"       aria-label="AI">
-    <span class="mn-icon">🤖</span><span class="mn-txt">AI</span>
-  </button>
   <button class="mobile-nav-btn"        id="mn-progress" onclick="showSection('progress')" aria-label="Progress">
     <span class="mn-icon">📊</span><span class="mn-txt">Progress</span>
+  </button>
+  <button class="mobile-nav-btn mobile-nav-btn--ai" id="mn-ai" onclick="showSection('ai')" aria-label="AI Sensei">
+    <span class="mn-icon">🤖</span><span class="mn-txt">AI</span>
   </button>
 </nav>
 
@@ -600,6 +498,7 @@
 <script src="js/data.js"></script>
 <script src="js/speech.js"></script>
 <script src="js/app.js"></script>
+<script src="js/ai.js"></script>
 
 <!-- PWA Service Worker -->
 <script>

@@ -1,17 +1,23 @@
-export default async function handler(req, res) {
-  // Faqat POST ruxsat
+export const config = { runtime: 'edge' };
+
+export default async function handler(req) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Faqat POST ruxsat' });
+    return new Response(JSON.stringify({ error: 'Faqat POST ruxsat' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
-  // API kalitni Vercel Environment Variables dan olish
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'API kalit sozlanmagan' });
+    return new Response(JSON.stringify({ error: 'API kalit sozlanmagan. Vercel > Settings > Environment Variables ga ANTHROPIC_API_KEY qoshing.' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   try {
-    const { messages, system } = req.body;
+    const { messages, system } = await req.json();
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -29,8 +35,14 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    return res.status(200).json(data);
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
